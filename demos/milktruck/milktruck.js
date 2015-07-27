@@ -21,10 +21,8 @@ window.truck = null;
 
 // Pull the Milktruck model from 3D Warehouse.
 var PAGE_PATH = document.location.href.replace(/\/[^\/]+$/, '/');
-var MODEL_URL =
-  'http://sketchup.google.com/3dwarehouse/download?'
-  + 'mid=3c9a1cac8c73c61b6284d71745f1efa9&rtyp=zip&'
-  + 'fn=milktruck&ctyp=milktruck';
+var MODEL_URL ='https://3dwarehouse.sketchup.com/warehouse/getpubliccontent?contentId=b918d18f-ce2b-453d-91a5-58ed55e8b2e3&fn=milktruck.kmz';
+
 var INIT_LOC = {
   lat: 37.423501,
   lon: -122.086744,
@@ -50,6 +48,7 @@ var ROLL_SPRING = 0.5;
 var ROLL_DAMP = -0.16;
 
 function Truck() {
+   
   var me = this;
 
   me.doTick = true;
@@ -81,17 +80,17 @@ function Truck() {
   me.idleTimer = 0;
   me.fastTimer = 0;
   me.popupTimer = 0;
-
-  ge.getOptions().setMouseNavigationEnabled(false);
-  ge.getOptions().setFlyToSpeed(100);  // don't filter camera motion
-
+ 
+//  ge.getOptions().setMouseNavigationEnabled(false);
+  ge.getOptions().setFlyToSpeed(100);  // don't filter camera motion    
+    
   window.google.earth.fetchKml(ge, MODEL_URL,
-                               function(obj) { me.finishInit(obj); });
+                               function(obj) {  me.finishInit(obj);  });
+    
 }
 
-Truck.prototype.finishInit = function(kml) {
+Truck.prototype.finishInit = function(kml) {      
   var me = this;
-
   walkKmlDom(kml, function() {
     if (this.getType() == 'KmlPlacemark' &&
         this.getGeometry() &&
@@ -126,7 +125,7 @@ Truck.prototype.finishInit = function(kml) {
   me.shadow.setIcon(ge.createIcon(''));
   me.shadow.setLatLonBox(ge.createLatLonBox(''));
   me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-  me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
+  me.shadow.getIcon().setHref('http://www.gearthblog.com/wp-content/uploads/2015/01/shadowrect.png');
   me.shadow.setVisibility(true);
   ge.getFeatures().appendChild(me.shadow);
 
@@ -142,6 +141,7 @@ Truck.prototype.finishInit = function(kml) {
   google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
       ge.getWindow().blur();
     });
+  
 }
 
 leftButtonDown = false;
@@ -559,6 +559,7 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
 // heading is optional.
 Truck.prototype.teleportTo = function(lat, lon, heading) {
   var me = this;
+    
   me.model.getLocation().setLatitude(lat);
   me.model.getLocation().setLongitude(lon);
   me.model.getLocation().setAltitude(ge.getGlobe().getGroundAltitude(lat, lon));
