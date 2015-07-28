@@ -21,7 +21,7 @@ window.truck = null;
 
 // Pull the Milktruck model from 3D Warehouse.
 var PAGE_PATH = document.location.href.replace(/\/[^\/]+$/, '/');
-var MODEL_URL ='https://3dwarehouse.sketchup.com/warehouse/getpubliccontent?contentId=b918d18f-ce2b-453d-91a5-58ed55e8b2e3&fn=milktruck.kmz';
+var MODEL_URL ='https://3dwarehouse.sketchup.com/warehouse/getpubliccontent?contentId=dc24a3d9-684a-43c9-9293-9b31d2511676&fn=Monster_Milktruck_High_Poly_Version.kmz';
 
 var INIT_LOC = {
   lat: 37.423501,
@@ -125,7 +125,7 @@ Truck.prototype.finishInit = function(kml) {
   me.shadow.setIcon(ge.createIcon(''));
   me.shadow.setLatLonBox(ge.createLatLonBox(''));
   me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-  me.shadow.getIcon().setHref('http://www.gearthblog.com/wp-content/uploads/2015/01/shadowrect.png');
+  me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
   me.shadow.setVisibility(true);
   ge.getFeatures().appendChild(me.shadow);
 
@@ -402,8 +402,6 @@ Truck.prototype.tick = function() {
   latLonBox.setEast(lla[1] - radius);
   latLonBox.setWest(lla[1] + radius);
   latLonBox.setRotation(-newhtr[0]);
-
-  me.tickPopups(dt);
   
   me.cameraFollow(dt, gpos, me.localFrame);
 };
@@ -432,83 +430,6 @@ function estimateGroundNormal(pos, frame) {
   var normal = V3.normalize([dx, dy, 2]);
   return normal;
 }
-
-// Decide when to open & close popup messages.
-Truck.prototype.tickPopups = function(dt) {
-  var me = this;
-  var speed = V3.length(me.vel);
-  if (me.popupTimer > 0) {
-    me.popupTimer -= dt;
-    me.idleTimer = 0;
-    me.fastTimer = 0;
-    if (me.popupTimer <= 0) {
-      me.popupTimer = 0;
-      ge.setBalloon(null);
-    }
-  } else {
-    if (speed < 20) {
-      me.idleTimer += dt;
-      if (me.idleTimer > 10.0) {
-        me.showIdlePopup();
-      }
-      me.fastTimer = 0;
-    } else {
-      me.idleTimer = 0;
-      if (speed > 80) {
-        me.fastTimer += dt;
-        if (me.fastTimer > 7.0) {
-          me.showFastPopup();
-        }
-      } else {
-        me.fastTimer = 0;
-      }
-    }
-  }
-};
-
-var IDLE_MESSAGES = [
-    "Let's deliver some milk!",
-    "Hello?",
-    "Dude, <font color=red><i>step on it!</i></font>",
-    "I'm sitting here getting sour!",
-    "We got customers waiting!",
-    "Zzzzzzz",
-    "Sometimes I wish I worked for UPS."
-                     ];
-Truck.prototype.showIdlePopup = function() {
-  var me = this;
-  me.popupTimer = 2.0;
-  var rand = Math.random();
-  var index = Math.floor(rand * IDLE_MESSAGES.length)
-    % IDLE_MESSAGES.length;
-  var message = "<center>" + IDLE_MESSAGES[index] + "</center>";
-  me.balloon.setContentString(message);
-  ge.setBalloon(me.balloon);
-};
-
-var FAST_MESSAGES = [
-    "Whoah there, cowboy!",
-    "Wheeeeeeeeee!",
-    "<font size=+5 color=#8080FF>Creamy!</font>",
-    "Hey, we're hauling glass bottles here!"
-                     ];
-Truck.prototype.showFastPopup = function() {
-  var me = this;
-  me.popupTimer = 2.0;
-  var rand = Math.random();
-  var index = Math.floor(rand * FAST_MESSAGES.length)
-    % FAST_MESSAGES.length;
-  var message = "<center>" + FAST_MESSAGES[index] + "</center>";
-  me.balloon.setContentString(message);
-  ge.setBalloon(me.balloon);
-};
-
-Truck.prototype.scheduleTick = function() {
-  var me = this;
-  if (me.doTick) {
-    setTimeout(function() { me.tick(); }, TICK_MS);
-  }
-};
 
 // Cut the camera to look at me.
 Truck.prototype.cameraCut = function() {
